@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { validateEmail } from '../../utils/helpers';
 
 function ContactForm() {
   const [formState, setFormState] = useState({
@@ -9,8 +10,29 @@ function ContactForm() {
 
   const { name, email, message } = formState;
 
+  const [errorMessage, setErrorMessage] = useState('');
+
   function handleChange(e) {
-    setFormState({ ...formState, [e.target.name]: e.target.value });
+    if(e.target.name === 'email') {
+        const isValid = validateEmail(e.target.value);
+        console.log(isValid)
+
+        if(!isValid) {
+            setErrorMessage('Your email is invalid.');
+        } else {
+            setErrorMessage('');
+        }
+    } else {
+        if(!e.target.value.length) {
+            setErrorMessage(`${e.target.name} is required.`);
+        } else {
+            setErrorMessage('');
+        }
+    }
+
+    if(!errorMessage) {
+        setFormState({ ...formState, [e.target.name]: e.target.value });
+    }
   }
 
   function handleSubmit(e) {
@@ -29,7 +51,7 @@ function ContactForm() {
             id="name"
             name="name"
             defaultValue={name}
-            onChange={handleChange}
+            onBlur={handleChange}
           />
         </div>
         <div>
@@ -39,7 +61,7 @@ function ContactForm() {
             id="email"
             name="email"
             defaultValue={email}
-            onChange={handleChange}
+            onBlur={handleChange}
           />
         </div>
         <div>
@@ -50,9 +72,14 @@ function ContactForm() {
             name="message"
             defaultValue={message}
             row="5"
-            onChange={handleChange}
+            onBlur={handleChange}
           />
         </div>
+        {errorMessage && ( 
+            <div>
+                <p className="error-text">{errorMessage}</p>
+            </div>
+        )}
         <button type="submit">Submit</button>
       </form>
     </section>
